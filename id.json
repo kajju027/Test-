@@ -5,8 +5,8 @@
       "name": "Star Sports Hindi",
       "type": "iframe",
       "iframeSrc": "https://allrounderlive.pages.dev/player2?url=https://rumble.com/live-hls-dvr/6z8fvo/playlist.m3u8?",
-      "hit": "https://dillzycreations.cricketstream745.workers.dev/hit?key=hindi",
-      "get": "https://dillzycreations.cricketstream745.workers.dev/get?key=hindi"
+      "hit": "https://sayan.kajju3864.workers.dev/hit?key=hindi",
+      "get": "https://sayan.kajju3864.workers.dev/get?key=hindi"
     },
     {
       "id": "tnt",
@@ -21,8 +21,8 @@
       "name": "Willow",
       "type": "iframe",
       "iframeSrc": "https://cricketstan.github.io/Willow-Cricbuzz-/",
-      "hit": "https://dillzycreations.cricketstream745.workers.dev/hit?key=willow",
-      "get": "https://dillzycreations.cricketstream745.workers.dev/get?key=willow"
+      "hit": "https://sayan.kajju3864.workers.dev/hit?key=willow",
+      "get": "https://sayan.kajju3864.workers.dev/get?key=willow"
     },
     {
       "id": "prime-hin",
