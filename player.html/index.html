@@ -5,13 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Premium Player</title>
 
-  <!-- Plyr CSS -->
   <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 
-  <!-- Hls.js -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
-  <!-- Plyr JS -->
   <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 
   <style>
@@ -56,7 +53,7 @@
       height: 100%;
     }
     
-    /* Custom controls styling */
+    /* Custom controls styling - Plyr handles most of this, but keeping for clarity */
     .plyr__controls {
       position: absolute;
       bottom: 0;
@@ -78,6 +75,7 @@
       justify-content: center;
       animation: glowBlink 2s infinite;
       z-index: 1;
+      padding: 0 10px; /* Added padding for smaller screens */
     }
 
     /* Glow Blinking */
@@ -93,40 +91,50 @@
     }
   </style>
 </head>
-<script type='text/javascript' src='//patienthercoldness.com/37/d7/1a/37d71a290dde379f3d1016fe3009fb4b.js'></script>
 <body>
-  <!-- Video Player -->
   <div id="playerWrapper">
     <div id="playerContainer">
       <video id="player" playsinline controls autoplay></video>
     </div>
   </div>
 
-  <!-- Info Text -->
-  <div id="infoText">âš¡ First 10 Second May be Buffer, Please Waitâš¡</div>
+  <div id="infoText">⚡ প্রথম ১০ সেকেন্ড বাফারিং হতে পারে, অনুগ্রহ করে অপেক্ষা করুন ⚡</div>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const videoUrl = urlParams.get("url");
+    // Reads the 'url' parameter from the URL query string
+    const videoUrl = urlParams.get("url"); 
     const video = document.getElementById("player");
-    let controlsTimeout;
-    const controlsHideDelay = 3000; // 3 seconds
-
-    if (Hls.isSupported()) {
+    
+    // --- Hls.js Integration ---
+    if (Hls.isSupported() && videoUrl) {
       const hls = new Hls();
       hls.loadSource(videoUrl);
       hls.attachMedia(video);
       
       hls.on(Hls.Events.MANIFEST_PARSED, function() {
         const levels = hls.levels;
+        // Set quality to a middle level for better initial experience (optional)
         if (levels && levels.length > 0) {
           hls.currentLevel = Math.floor(levels.length / 2);
         }
       });
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+
+    } else if (video.canPlayType('application/vnd.apple.mpegurl') && videoUrl) {
+      // Fallback for native HLS support (e.g., Safari on iOS/macOS)
       video.src = videoUrl;
+    } else {
+      // Handle case where URL is missing or HLS is not supported
+      if (!videoUrl) {
+        console.error("Video URL parameter is missing.");
+        document.getElementById("infoText").innerText = "❌ ভিডিও URL পাওয়া যায়নি।";
+      } else {
+        console.error("HLS is not supported by this browser.");
+        document.getElementById("infoText").innerText = "⚠️ আপনার ব্রাউজার HLS স্ট্রিম সমর্থন করে না।";
+      }
     }
 
+    // --- Plyr Initialization ---
     const player = new Plyr(video, {
       autoplay: true,
       controls: [
@@ -142,55 +150,22 @@
         'fullscreen'
       ],
       settings: ['quality', 'speed'],
-      hideControls: true // Let Plyr handle basic hide/show
+      // Plyr's built-in control hiding (on idle) is preferred.
+      // Setting 'hideControls: false' is the default but keeps control visibility consistent.
+      hideControls: false 
     });
 
-    // Custom control visibility handler
-    function showControls() {
-      const controls = document.querySelector('.plyr__controls');
-      if (controls) {
-        controls.style.opacity = '1';
-        controls.style.pointerEvents = 'auto';
-      }
-      resetControlsTimer();
-    }
-
-    function hideControls() {
-      const controls = document.querySelector('.plyr__controls');
-      if (controls && !player.paused) {
-        controls.style.opacity = '0';
-        controls.style.pointerEvents = 'none';
-      }
-    }
-
-    function resetControlsTimer() {
-      clearTimeout(controlsTimeout);
-      controlsTimeout = setTimeout(hideControls, controlsHideDelay);
-    }
-
-    // Event listeners for controls visibility
-    player.elements.container.addEventListener('mousemove', showControls);
-    player.elements.container.addEventListener('touchstart', showControls);
-    player.elements.container.addEventListener('mouseleave', hideControls);
-
-    // Initial setup
-    player.on('ready', () => {
-      // Start with controls visible, then hide after delay
-      showControls();
-      resetControlsTimer();
-    });
-
-    // Show controls when playing/pausing
-    player.on('play', showControls);
-    player.on('pause', showControls);
+    // --- Control Visibility Cleanup ---
+    // Removed custom show/hide logic as Plyr's default behavior handles it well.
+    // The previous custom logic conflicted with Plyr's internal state.
 
     // Prevent container resize when quality changes
     player.on('qualitychange', event => {
+      // This line is often unnecessary if CSS handles sizing, but kept if needed for specific use cases
       const wrapper = document.getElementById('playerWrapper');
       wrapper.style.width = wrapper.offsetWidth + 'px';
       wrapper.style.height = wrapper.offsetHeight + 'px';
     });
   </script>
 </body>
-<script type='text/javascript' src='//checkupoceandip.com/63/88/ac/6388ace5c2a702a7b58f724683244363.js'></script>
 </html>
