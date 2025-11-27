@@ -15,9 +15,9 @@
 <style>
 :root{
   --bg-color: #121212;
-  --primary-main: #c70c0c; 
-  --primary-alt: #db1f1f;
-  --primary-alt-dark: #a60000;
+  --primary-main: #0074c7; /* New Blue Color */
+  --primary-alt: #0088e0; /* Lighter Blue */
+  --primary-alt-dark: #005a9b; /* Darker Blue */
   --card-bg: #1e1e1e;
   --text-light: #f1f5f9;
   --text-muted: #94a3b8;
@@ -77,12 +77,12 @@ body{
   gap:.5rem;
   font-size:.78rem;
   animation:badgePulse 1.6s infinite;
-  box-shadow:0 6px 18px rgba(199,12,12,0.12);
+  box-shadow:0 6px 18px rgba(0,116,199,0.12);
 }
 @keyframes badgePulse{
-  0%{ transform:scale(1); box-shadow:0 0 0 0 rgba(199,12,12,0.18); }
-  70%{ box-shadow:0 0 0 10px rgba(199,12,12,0); }
-  100%{ box-shadow:0 0 0 0 rgba(199,12,12,0); }
+  0%{ transform:scale(1); box-shadow:0 0 0 0 rgba(0,116,199,0.18); }
+  70%{ box-shadow:0 0 0 10px rgba(0,116,199,0); }
+  100%{ box-shadow:0 0 0 0 rgba(0,116,199,0); }
 }
 
 /* player */
@@ -135,7 +135,7 @@ body{
   transition:transform .18s ease, box-shadow .18s ease;
   font-size:1rem;
 }
-.action-button:hover{ transform:translateY(-3px); box-shadow:0 12px 36px rgba(199,12,12,0.18); }
+.action-button:hover{ transform:translateY(-3px); box-shadow:0 12px 36px rgba(0,116,199,0.18); }
 .action-button.copied{ background:linear-gradient(90deg,#22c55e,#4ade80); }
 
 /* back link */
@@ -152,7 +152,7 @@ body{
 }
 .back-link:hover{ background:rgba(255,255,255,0.02); color:var(--text-light); }
 
-/* telegram popup (পরিবর্তিত) */
+/* telegram popup */
 .telegram-popup{
   position:fixed;
   top:50%;
@@ -160,57 +160,71 @@ body{
   transform:translate(-50%,-50%) scale(.96);
   background:#131313;
   color:var(--text-light);
-  /* পপআপের আকার আরও একটু বাড়ানো হলো */
-  padding:45px 25px; 
-  border-radius:16px;
-  border:1px solid rgba(199,12,12,0.14);
+  padding:35px 28px;
+  border-radius:18px;
+  border:1px solid rgba(0,116,199,0.14);
   box-shadow:0 30px 90px rgba(0,0,0,0.7);
   z-index:12000;
   width:92%;
-  max-width:400px; /* আকার সামঞ্জস্য করা হলো */
+  max-width:450px;
   display:none;
   opacity:0;
   transition:all .28s cubic-bezier(.2,.9,.2,1);
   text-align:center;
 }
 .telegram-popup.show{ display:block; opacity:1; transform:translate(-50%,-50%) scale(1); }
-.telegram-popup h2{ color:var(--primary-main); font-size:1.6rem; margin-bottom:.55rem; text-shadow:0 0 12px rgba(199,12,12,0.06); }
+.telegram-popup h2{ color:var(--primary-main); font-size:1.8rem; margin-bottom:.55rem; text-shadow:0 0 12px rgba(0,116,199,0.06); }
 .telegram-popup p{ color:var(--text-muted); line-height:1.5; margin-bottom:1.2rem; }
 
-/* join/ok buttons inside popup (পরিবর্তিত - আকার বাড়ানো হলো) */
+/* join/ok buttons inside popup */
 .telegram-popup button{
   width:100%;
-  /* বাটনের প্যাডিং ও ফন্ট সাইজ বাড়ানো হলো */
-  padding:14px; 
-  border-radius:12px;
+  padding:14px;
+  border-radius:10px;
   border:0;
   font-weight:800;
   cursor:pointer;
-  font-size:1.1rem; 
+  transition:transform .1s ease, box-shadow .1s ease;
 }
+.telegram-popup button:active{ transform:scale(0.98); }
+
 .telegram-popup .join-btn{
   background:linear-gradient(90deg,var(--primary-main),var(--primary-alt));
   color:#fff;
-  box-shadow:0 10px 30px rgba(199,12,12,0.14);
-  margin-bottom:.8rem; /* দুটি বাটনের মধ্যে দূরত্ব বাড়ানো হলো */
+  box-shadow:0 10px 30px rgba(0,116,199,0.20);
+  margin-bottom:.8rem;
+  padding:16px; /* Join Now button is slightly bigger */
+  font-size:1.1rem;
 }
 .telegram-popup .joined-btn{
   background:#222;
   color:var(--text-light);
-  border:1px solid rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.05);
+  font-size:1rem;
+}
+
+/* visitor dot & popup - Hiding the visual elements */
+.visitor-dot, .visitor-popup{
+  display:none !important;
 }
 
 /* error */
-.error-message{ text-align:center; padding:3.2rem 1rem; background:var(--card-bg); border-radius:12px; border:1px solid var(--border-color); }
+.error-message{ 
+    text-align:center; 
+    padding:3.2rem 1rem; 
+    background:var(--card-bg); 
+    border-radius:12px; 
+    border:1px solid var(--border-color); 
+    margin-top: 10vh; /* Centering the error vertically */
+}
 .error-message h2{ color:var(--primary-main); margin-bottom:.6rem; font-size:1.4rem; }
 
 /* responsive */
 @media (max-width:600px){
   #player-container{ height:48vh; }
   .stream-header h1{ font-size:1.05rem; }
-  /* মোবাইল স্ক্রিনে পপআপের প্যাডিং বাড়ানো হলো */
-  .telegram-popup{ padding:35px 20px; width:94%; max-width:360px; }
-  .telegram-popup button{ padding:12px; font-size:1rem; }
+  .telegram-popup{ padding:25px 20px; width:94%; max-width:380px; }
+  .telegram-popup h2{ font-size:1.5rem; }
 }
 </style>
 </head>
@@ -220,44 +234,34 @@ body{
 </main>
 
 <div class="telegram-popup" id="telegramPopup" role="dialog" aria-modal="true" aria-hidden="true">
-  <h2><i class="fa-brands fa-telegram"></i> Support Us!</h2>
-  <p>Join our WhatsApp Channel <strong>𝗖𝗥𝗜𝗖𝗞𝗘𝗧 𝗡𝗘𝗪 এস 𝗣𝗢𝗜𝗡𝗧</strong></p>
+  <h2><i class="fa-brands fa-whatsapp"></i> Join Our Channel</h2>
+  <p>Follow us for instant updates and exclusive content on our Official WhatsApp Channel <strong>𝗖𝗥𝗜𝗖𝗞େট 𝗡𝗘𝗪𝗦 𝗣𝗢𝗜𝗡𝗧</strong></p>
   <a id="joinLink" href="https://whatsapp.com/channel/0029VaeylYYBPzjVNomWuZ0T" target="_blank" rel="noopener">
     <button class="join-btn">Join Now</button>
   </a>
   <button class="joined-btn" id="alreadyJoinedBtn">Already Joined</button>
 </div>
 
+<div id="hiddenVisitorCounter" style="display:none;">
+  <img src="https://www.counter12.com/img-9205Yd3W54Z3y43Z-5.gif" alt="Visitor Counter Tracker">
+</div>
+
 <script>
 /*
   Full page JS: fetch JSON, render UI, share-copy, popup logic.
-  Visitor Counter is now loaded silently in the background.
 */
 (function(){
+  // NOTE: Ensure this URL points to your correct JSON file
   const FETCH_URL = 'https://raw.githubusercontent.com/Cricketstan/Allrounder-/refs/heads/main/id.json';
-  const VISITOR_IMG_URL = 'https://www.counter12.com/img-9205Yd3W54Z3y43Z-5.gif'; // লুকানো কাউন্টার
 
   // DOM refs
   const streamContent = document.getElementById('stream-content');
   const telegramPopup = document.getElementById('telegramPopup');
   const joinLink = document.getElementById('joinLink');
   const alreadyJoinedBtn = document.getElementById('alreadyJoinedBtn');
-
+  
   // helpers
   function safeHTML(str){ const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
-
-  // 1. ভিজিটর কাউন্টারকে ব্যাকগ্রাউন্ডে লোড করার ফাংশন
-  function loadVisitorCounter(){
-    const img = document.createElement('img');
-    img.src = VISITOR_IMG_URL;
-    // কাউন্টার লুকানোর জন্য স্টাইল
-    img.style.position = 'absolute';
-    img.style.left = '-9999px';
-    img.style.width = '1px';
-    img.style.height = '1px';
-    img.setAttribute('alt', 'Visitor Counter');
-    document.body.appendChild(img);
-  }
 
   // Render functions
   function renderIframeUI(data){
@@ -273,7 +277,7 @@ body{
       </div>
 
       <div class="info-card">
-        <h2><i class="fa-solid fa-bell"></i> Follow us for Updates!</h2>
+        <h2><i class="fa-brands fa-whatsapp"></i> Follow us for Updates!</h2>
         <a href="${joinLink.href}" target="_blank" rel="noopener" class="action-button">
           <i class="fa-brands fa-whatsapp"></i> Click Here To Join WhatsApp
         </a>
@@ -287,7 +291,7 @@ body{
       <a href="#" class="back-link" id="backLink"><i class="fa-solid fa-arrow-left"></i> Back to All Streams</a>
     `;
 
-    // share button
+    // share button logic
     const shareBtn = document.getElementById('shareButton');
     if(shareBtn){
       shareBtn.addEventListener('click', async function(){
@@ -317,10 +321,14 @@ body{
 
   function renderErrorUI(){
     document.title = 'Error - Stream Not Found';
+    // Ensure the container is visible even when showing an error
+    document.querySelector('.container').style.opacity = 1; 
+    document.querySelector('.container').style.transform = 'translateY(0)';
+    
     streamContent.innerHTML = `
       <div class="error-message">
         <h2><i class="fa-solid fa-triangle-exclamation"></i> Stream Not Found</h2>
-        <p>The requested stream ID is invalid or offline.</p>
+        <p>The requested stream ID is invalid or offline, or no stream ID was provided.</p>
         <a href="#" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to All Streams</a>
       </div>
     `;
@@ -328,24 +336,27 @@ body{
 
   // Popup logic
   function showPopup(delay = 1200){
-    setTimeout(()=>{
-      telegramPopup.classList.add('show');
-      telegramPopup.setAttribute('aria-hidden','false');
-    }, delay);
+    // Only show popup if it hasn't been closed by the user this session
+    if(sessionStorage.getItem('popupClosed') !== 'true'){
+        setTimeout(()=>{
+            telegramPopup.classList.add('show');
+            telegramPopup.setAttribute('aria-hidden','false');
+        }, delay);
+    }
   }
   function closePopup(){
     telegramPopup.classList.remove('show');
     telegramPopup.setAttribute('aria-hidden','true');
+    // Set flag so it doesn't show again this session
+    sessionStorage.setItem('popupClosed', 'true');
   }
 
   // already joined closes popup
   alreadyJoinedBtn.addEventListener('click', closePopup);
+  joinLink.addEventListener('click', closePopup); // Also close on actual join click
 
   // Main init
   async function initializeApp(){
-    // ভিজিটর কাউন্টার ব্যাকগ্রাউন্ডে লোড করুন
-    loadVisitorCounter(); 
-
     try{
       const resp = await fetch(FETCH_URL, {cache:'no-store'});
       if(!resp.ok) throw new Error('Fetch failed: ' + resp.status);
@@ -355,25 +366,24 @@ body{
       const urlParams = new URLSearchParams(window.location.search);
       const streamId = urlParams.get('id') || urlParams.get('channel') || null;
 
+      // 1. If no ID is present in URL (The condition you wanted fixed)
       if(!streamId){
-        // fallback
-        if(Array.isArray(data.iframes) && data.iframes.length){
-          renderIframeUI(data.iframes[0]);
-          showPopup(1200);
-        } else {
-          renderErrorUI();
-        }
+        // *** FIX APPLIED: Immediately show error when no ID is present ***
+        renderErrorUI(); 
         return;
       }
 
+      // 2. If ID is present, try to find it
       const streamData = Array.isArray(data.iframes) ? data.iframes.find(item => String(item.id) === String(streamId)) : null;
       if(streamData){
         renderIframeUI(streamData);
         showPopup(1200);
       } else {
+        // 3. ID is present but not found in the JSON file (This was already correct)
         renderErrorUI();
       }
     }catch(err){
+      // Catch network errors or JSON parse errors and show Error UI
       console.error('initializeApp error:', err);
       renderErrorUI();
     }
