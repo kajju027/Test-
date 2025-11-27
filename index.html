@@ -193,14 +193,15 @@ body{
   color:#fff;
   box-shadow:0 10px 30px rgba(0,116,199,0.20);
   margin-bottom:.8rem;
-  padding:16px; /* Join Now button is slightly bigger */
-  font-size:1.1rem;
+  padding:18px; /* Increased padding */
+  font-size:1.2rem; /* Increased font size */
 }
 .telegram-popup .joined-btn{
   background:#222;
   color:var(--text-light);
   border:1px solid rgba(255,255,255,0.05);
-  font-size:1rem;
+  padding:16px; /* Increased padding */
+  font-size:1.1rem; /* Increased font size */
 }
 
 /* visitor dot & popup - Hiding the visual elements */
@@ -235,7 +236,7 @@ body{
 
 <div class="telegram-popup" id="telegramPopup" role="dialog" aria-modal="true" aria-hidden="true">
   <h2><i class="fa-brands fa-whatsapp"></i> Join Our Channel</h2>
-  <p>Follow us for instant updates and exclusive content on our Official WhatsApp Channel <strong>𝗖𝗥𝗜𝗖𝗞େট 𝗡𝗘𝗪𝗦 𝗣𝗢𝗜𝗡𝗧</strong></p>
+  <p>Follow us for instant updates and exclusive content on our Official WhatsApp Channel <strong>𝗖𝗥𝗜𝗖𝗞ੇট 𝗡𝗘𝗪𝗦 𝗣𝗢𝗜𝗡𝗧</strong></p>
   <a id="joinLink" href="https://whatsapp.com/channel/0029VaeylYYBPzjVNomWuZ0T" target="_blank" rel="noopener">
     <button class="join-btn">Join Now</button>
   </a>
@@ -334,14 +335,12 @@ body{
     `;
   }
 
-  // Popup logic
-  function showPopup(delay = 1200){
+  // Popup logic (REMOVED DELAY)
+  function showPopup(){
     // Only show popup if it hasn't been closed by the user this session
     if(sessionStorage.getItem('popupClosed') !== 'true'){
-        setTimeout(()=>{
-            telegramPopup.classList.add('show');
-            telegramPopup.setAttribute('aria-hidden','false');
-        }, delay);
+        telegramPopup.classList.add('show');
+        telegramPopup.setAttribute('aria-hidden','false');
     }
   }
   function closePopup(){
@@ -366,9 +365,9 @@ body{
       const urlParams = new URLSearchParams(window.location.search);
       const streamId = urlParams.get('id') || urlParams.get('channel') || null;
 
-      // 1. If no ID is present in URL (The condition you wanted fixed)
+      // 1. If no ID is present in URL
       if(!streamId){
-        // *** FIX APPLIED: Immediately show error when no ID is present ***
+        // Show error when no ID is present
         renderErrorUI(); 
         return;
       }
@@ -377,9 +376,9 @@ body{
       const streamData = Array.isArray(data.iframes) ? data.iframes.find(item => String(item.id) === String(streamId)) : null;
       if(streamData){
         renderIframeUI(streamData);
-        showPopup(1200);
+        showPopup(); // Call immediately
       } else {
-        // 3. ID is present but not found in the JSON file (This was already correct)
+        // 3. ID is present but not found in the JSON file
         renderErrorUI();
       }
     }catch(err){
