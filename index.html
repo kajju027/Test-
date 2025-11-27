@@ -335,19 +335,17 @@ body{
     `;
   }
 
-  // Popup logic (REMOVED DELAY)
+  // Popup logic (FIXED: Removed sessionStorage and delay)
   function showPopup(){
-    // Only show popup if it hasn't been closed by the user this session
-    if(sessionStorage.getItem('popupClosed') !== 'true'){
-        telegramPopup.classList.add('show');
-        telegramPopup.setAttribute('aria-hidden','false');
-    }
+    // Show popup every time, regardless of previous visits
+    telegramPopup.classList.add('show');
+    telegramPopup.setAttribute('aria-hidden','false');
   }
+  
   function closePopup(){
     telegramPopup.classList.remove('show');
     telegramPopup.setAttribute('aria-hidden','true');
-    // Set flag so it doesn't show again this session
-    sessionStorage.setItem('popupClosed', 'true');
+    // REMOVED: sessionStorage.setItem('popupClosed', 'true');
   }
 
   // already joined closes popup
@@ -376,7 +374,7 @@ body{
       const streamData = Array.isArray(data.iframes) ? data.iframes.find(item => String(item.id) === String(streamId)) : null;
       if(streamData){
         renderIframeUI(streamData);
-        showPopup(); // Call immediately
+        showPopup(); // Call immediately on stream load
       } else {
         // 3. ID is present but not found in the JSON file
         renderErrorUI();
