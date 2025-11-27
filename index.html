@@ -1,229 +1,429 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, maximum-scale=1.0, user-scalable=no">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, maximum-scale=1.0, user-scalable=no" />
 <title>CRICKET NEWS POINT ™</title>
 
-<!-- Google Fonts -->
+<!-- Fonts (user requested) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amaranth:ital,wght@0,400;0,700;1,700&family=Bebas+Neue&family=Momo+Trust+Display&family=Science+Gothic:slnt,wdth,wght,CTRS@-10..0,50..200,100..900,0..85&display=swap" rel="stylesheet">
 
+<!-- Player / icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.3.4/dist/controls.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
-:root {
-    --primary: #c70c0c;
-    --dark: #0d0d0d;
-    --card: #1b1b1b;
-    --border: #2a2a2a;
-    --text: #ffffff;
-    --muted: #b3b3b3;
+:root{
+  --bg-color: #121212;
+  --primary-main: #c70c0c; /* user's primary color */
+  --primary-alt: #db1f1f;
+  --primary-alt-dark: #a60000;
+  --card-bg: #1e1e1e;
+  --text-light: #f1f5f9;
+  --text-muted: #94a3b8;
+  --border-color: #2d2d2d;
 }
 
-* { margin:0; padding:0; box-sizing:border-box; }
-body {
-    font-family: "Amaranth", sans-serif;
-    background: var(--dark);
-    color: var(--text);
-    padding: 1rem;
-    display:flex;
-    justify-content:center;
-    min-height:100vh;
+/* base */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family: 'Amaranth','Momo Trust Display','Science Gothic','Bebas Neue', sans-serif;
+  background:var(--bg-color);
+  color:var(--text-light);
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding:1rem;
+  min-height:100vh;
 }
 
-.container {
-    width:100%;
-    max-width:850px;
+/* container */
+.container{
+  width:100%;
+  max-width:900px;
+  opacity:0;
+  transform:translateY(24px);
+  animation:fadeIn .55s ease-out forwards;
+}
+@keyframes fadeIn{ to{ opacity:1; transform:translateY(0);}}
+
+/* header */
+.stream-header{
+  background:var(--card-bg);
+  border:1px solid var(--border-color);
+  padding:.85rem 1.25rem;
+  border-radius:14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:1rem;
+  margin-bottom:1rem;
+}
+.stream-header h1{
+  font-size:1.35rem;
+  font-weight:700;
+  letter-spacing:.4px;
+  color:var(--text-light);
+}
+.live-badge{
+  background:linear-gradient(90deg,var(--primary-main),var(--primary-alt));
+  color:#fff;
+  padding:.28rem .75rem;
+  border-radius:20px;
+  font-weight:800;
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  font-size:.78rem;
+  animation:badgePulse 1.6s infinite;
+  box-shadow:0 6px 18px rgba(199,12,12,0.12);
+}
+@keyframes badgePulse{
+  0%{ transform:scale(1); box-shadow:0 0 0 0 rgba(199,12,12,0.18); }
+  70%{ box-shadow:0 0 0 10px rgba(199,12,12,0); }
+  100%{ box-shadow:0 0 0 0 rgba(199,12,12,0); }
 }
 
-/* Header */
-.header {
-    background: var(--card);
-    border:1px solid var(--border);
-    padding:1rem 1.5rem;
-    border-radius:15px;
-    font-family:"Momo Trust Display", sans-serif;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:1rem;
-}
-.header h1 { font-size:1.7rem; }
-.live {
-    background: var(--primary);
-    padding:0.3rem 1rem;
-    border-radius:20px;
-    font-weight:bold;
-    animation:pulse 1.5s infinite;
-}
-@keyframes pulse {
-    0% { box-shadow:0 0 0 0 rgba(199,12,12,0.7); }
-    70% { box-shadow:0 0 0 12px rgba(199,12,12,0); }
-    100% { box-shadow:0 0 0 0 rgba(199,12,12,0); }
+/* player */
+#player-container{
+  width:100%;
+  height:56vh;
+  max-height:640px;
+  background:#000;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 18px 60px rgba(0,0,0,0.6);
+  border:1px solid rgba(255,255,255,0.02);
 }
 
-/* Player */
-#player-box {
-    width:100%;
-    height:50vh;
-    max-height:600px;
-    background:black;
-    border-radius:12px;
-    overflow:hidden;
-    box-shadow:0 10px 25px rgba(0,0,0,0.5);
+/* info card */
+.info-card{
+  background:var(--card-bg);
+  border:1px solid var(--border-color);
+  border-radius:12px;
+  padding:1.15rem;
+  margin-top:1rem;
+  text-align:center;
+}
+.info-card h2{
+  font-size:1rem;
+  font-weight:700;
+  margin-bottom:.85rem;
+  color:var(--text-muted);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:.5rem;
 }
 
-/* Cards */
-.card {
-    background:var(--card);
-    border:1px solid var(--border);
-    padding:1.2rem;
-    border-radius:12px;
-    margin-top:1rem;
-    text-align:center;
+/* buttons */
+.action-button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.75rem;
+  width:100%;
+  padding:.85rem 1rem;
+  border-radius:10px;
+  background:linear-gradient(90deg,var(--primary-alt),var(--primary-alt-dark));
+  color:#fff;
+  font-weight:700;
+  text-decoration:none;
+  border:0;
+  cursor:pointer;
+  transition:transform .18s ease, box-shadow .18s ease;
+  font-size:1rem;
 }
-.card h2 {
-    color:var(--muted);
-    font-size:1.1rem;
-    margin-bottom:0.7rem;
-    font-family:"Science Gothic", sans-serif;
+.action-button:hover{ transform:translateY(-3px); box-shadow:0 12px 36px rgba(199,12,12,0.18); }
+.action-button.copied{ background:linear-gradient(90deg,#22c55e,#4ade80); }
+
+/* back link */
+.back-link{
+  display:inline-block;
+  width:100%;
+  text-align:center;
+  margin-top:1rem;
+  color:var(--text-muted);
+  text-decoration:none;
+  padding:.6rem;
+  border-radius:8px;
+  transition:background-color .15s ease;
+}
+.back-link:hover{ background:rgba(255,255,255,0.02); color:var(--text-light); }
+
+/* telegram popup */
+.telegram-popup{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) scale(.96);
+  background:#131313;
+  color:var(--text-light);
+  padding:30px 22px;
+  border-radius:16px;
+  border:1px solid rgba(199,12,12,0.14);
+  box-shadow:0 30px 90px rgba(0,0,0,0.7);
+  z-index:12000;
+  width:92%;
+  max-width:420px;
+  display:none;
+  opacity:0;
+  transition:all .28s cubic-bezier(.2,.9,.2,1);
+  text-align:center;
+}
+.telegram-popup.show{ display:block; opacity:1; transform:translate(-50%,-50%) scale(1); }
+.telegram-popup h2{ color:var(--primary-main); font-size:1.6rem; margin-bottom:.55rem; text-shadow:0 0 12px rgba(199,12,12,0.06); }
+.telegram-popup p{ color:var(--text-muted); line-height:1.5; margin-bottom:1rem; }
+
+/* join/ok buttons inside popup */
+.telegram-popup button{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:0;
+  font-weight:800;
+  cursor:pointer;
+}
+.telegram-popup .join-btn{
+  background:linear-gradient(90deg,var(--primary-main),var(--primary-alt));
+  color:#fff;
+  box-shadow:0 10px 30px rgba(199,12,12,0.14);
+  margin-bottom:.6rem;
+}
+.telegram-popup .joined-btn{
+  background:#222;
+  color:var(--text-light);
+  border:1px solid rgba(255,255,255,0.02);
 }
 
-.btn {
-    background:var(--primary);
-    color:white;
-    text-decoration:none;
-    padding:0.9rem 1rem;
-    display:block;
-    border-radius:10px;
-    font-weight:bold;
-    margin-top:0.6rem;
-    transition:0.3s;
+/* visitor dot & popup */
+.visitor-dot{
+  position:fixed;
+  right:24px;
+  bottom:22px;
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  background:var(--primary-main);
+  box-shadow:0 8px 28px rgba(199,12,12,0.25);
+  z-index:11000;
+  cursor:pointer;
 }
-.btn:hover { opacity:0.8; }
+.visitor-popup{
+  display:none;
+  position:fixed;
+  right:24px;
+  bottom:64px;
+  background:#0f0f0f;
+  border-radius:10px;
+  padding:10px;
+  border:1px solid rgba(255,255,255,0.03);
+  box-shadow:0 12px 40px rgba(0,0,0,0.6);
+  z-index:11000;
+}
+.visitor-popup img{ width:150px; height:auto; display:block; }
 
-.btn-copy.copied {
-    background: #22c55e !important;
-}
+/* error */
+.error-message{ text-align:center; padding:3.2rem 1rem; background:var(--card-bg); border-radius:12px; border:1px solid var(--border-color); }
+.error-message h2{ color:var(--primary-main); margin-bottom:.6rem; font-size:1.4rem; }
 
-/* Hidden Visitor Counter */
-.hidden-counter {
-    width:1px;
-    height:1px;
-    overflow:hidden;
-    opacity:0;
-    position:absolute;
-    pointer-events:none;
-}
-
-/* Popup */
-.popup {
-    position:fixed;
-    top:50%; left:50%;
-    transform:translate(-50%, -50%) scale(0.9);
-    background:#1a1a1a;
-    padding:35px 25px;
-    border-radius:18px;
-    border:1px solid rgba(199,12,12,0.5);
-    width:90%; max-width:380px;
-    text-align:center;
-    display:none;
-    color:white;
-}
-.popup h2 {
-    font-family:"Momo Trust Display", sans-serif;
-    font-size:1.7rem;
-    color:var(--primary);
+/* responsive */
+@media (max-width:600px){
+  #player-container{ height:48vh; }
+  .stream-header h1{ font-size:1.05rem; }
+  .telegram-popup{ padding:22px; width:94%; max-width:360px; }
 }
 </style>
 </head>
 <body>
-
-<div class="hidden-counter">
-    <img src="https://counter1.optistats.ovh/private/freecounterstat.php?c=5ggh91rsudsf178p2fp3f6r7e4jmw8jj" alt="counter">
-</div>
-
 <main class="container">
-    <div id="content"></div>
+  <div id="stream-content" aria-live="polite"></div>
 </main>
 
-<div class="popup" id="popupBox">
-    <h2>Support Us!</h2>
-    <p>Join our WhatsApp Channel for instant updates.</p>
-    <a href="https://whatsapp.com/channel/0029VaeylYYBPzjVNomWuZ0T" target="_blank" class="btn">Join Now</a>
-    <br>
-    <button class="btn" onclick="closePopup()">Already Joined</button>
+<!-- Telegram / WhatsApp popup -->
+<div class="telegram-popup" id="telegramPopup" role="dialog" aria-modal="true" aria-hidden="true">
+  <h2><i class="fa-brands fa-telegram"></i> Support Us!</h2>
+  <p>Join our WhatsApp Channel <strong>𝗖𝗥𝗜𝗖𝗞𝗘𝗧 𝗡𝗘𝗪𝗦 𝗣𝗢𝗜𝗡𝗧</strong></p>
+  <a id="joinLink" href="https://whatsapp.com/channel/0029VaeylYYBPzjVNomWuZ0T" target="_blank" rel="noopener">
+    <button class="join-btn">Join Now</button>
+  </a>
+  <button class="joined-btn" id="alreadyJoinedBtn">Already Joined</button>
 </div>
 
+<!-- visitor UI -->
+<div class="visitor-dot" id="visitorDot" title="Visitors"></div>
+<div class="visitor-popup" id="visitorPopup" aria-hidden="true">
+  <img src="https://www.counter12.com/img-9205Yd3W54Z3y43Z-5.gif" alt="Visitor Counter">
+</div>
+
+<!-- All JS (single block) -->
 <script>
-async function start() {
-    try {
-        const res = await fetch("https://raw.githubusercontent.com/Cricketstan/Allrounder-/refs/heads/main/id.json");
-        const data = await res.json();
+/*
+  Full page JS: fetch JSON, render UI, share-copy, popup logic, visitor dot toggle.
+  NOTE: If you want different JSON source change the FETCH_URL variable.
+*/
+(function(){
+  const FETCH_URL = 'https://raw.githubusercontent.com/Cricketstan/Allrounder-/refs/heads/main/id.json';
 
-        const url = new URLSearchParams(window.location.search);
-        const id = url.get("id");
+  // DOM refs
+  const streamContent = document.getElementById('stream-content');
+  const telegramPopup = document.getElementById('telegramPopup');
+  const joinLink = document.getElementById('joinLink');
+  const alreadyJoinedBtn = document.getElementById('alreadyJoinedBtn');
+  const visitorDot = document.getElementById('visitorDot');
+  const visitorPopup = document.getElementById('visitorPopup');
 
-        const found = data.iframes.find(a => a.id === id);
-        if (!found) return showError();
+  // helpers
+  function safeHTML(str){ const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
 
-        document.title = found.name;
-        render(found);
-        setTimeout(() => showPopup(), 1200);
-    } catch(e){ showError(); }
-}
+  // Render functions
+  function renderIframeUI(data){
+    document.title = `${data.name} • CRICKET NEWS POINT`;
+    streamContent.innerHTML = `
+      <div class="stream-header">
+        <h1>${safeHTML(data.name)}</h1>
+        <div class="live-badge"><i class="fa-solid fa-circle"></i> LIVE</div>
+      </div>
 
-function render(item){
-    document.getElementById("content").innerHTML = `
-        <div class="header">
-            <h1>${item.name}</h1>
-            <span class="live">LIVE</span>
-        </div>
-        <div id="player-box">
-            <iframe src="${item.iframeSrc}" width="100%" height="100%" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-        </div>
-        <div class="card">
-            <h2>Follow Us for Updates</h2>
-            <a class="btn" href="https://whatsapp.com/channel/0029VaeylYYBPzjVNomWuZ0T" target="_blank">Join WhatsApp Channel</a>
-        </div>
-        <div class="card">
-            <h2>Share This Page</h2>
-            <button class="btn btn-copy" id="copyBtn">Copy Page Link</button>
-        </div>
+      <div id="player-container">
+        <iframe src="${data.iframeSrc}" style="width:100%; height:100%; border:0;" allow="encrypted-media; autoplay; fullscreen" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+      </div>
+
+      <div class="info-card">
+        <h2><i class="fa-solid fa-bell"></i> Follow us for Updates!</h2>
+        <a href="${joinLink.href}" target="_blank" rel="noopener" class="action-button">
+          <i class="fa-brands fa-whatsapp"></i> Click Here To Join WhatsApp
+        </a>
+      </div>
+
+      <div class="info-card">
+        <h2><i class="fa-solid fa-link"></i> Copy Link & Share</h2>
+        <button class="action-button" id="shareButton"><i class="fa-solid fa-share-nodes"></i> Click Here To Share This Page Link</button>
+      </div>
+
+      <a href="#" class="back-link" id="backLink"><i class="fa-solid fa-arrow-left"></i> Back to All Streams</a>
     `;
 
-    document.getElementById("copyBtn").addEventListener("click", async ()=>{
-        await navigator.clipboard.writeText(window.location.href);
-        const b = document.getElementById("copyBtn");
-        b.innerText = "Link Copied!";
-        b.classList.add("copied");
-        setTimeout(()=>{
-            b.innerText = "Copy Page Link";
-            b.classList.remove("copied");
-        },1500);
-    });
-}
+    // share button
+    const shareBtn = document.getElementById('shareButton');
+    if(shareBtn){
+      shareBtn.addEventListener('click', async function(){
+        try{
+          const url = window.location.href;
+          if(navigator.clipboard && navigator.clipboard.writeText){
+            await navigator.clipboard.writeText(url);
+          } else {
+            // fallback
+            const ta = document.createElement('textarea');
+            ta.value = url;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            ta.remove();
+          }
+          const original = shareBtn.innerHTML;
+          shareBtn.innerHTML = '<i class="fa-solid fa-check"></i> Link Copied!';
+          shareBtn.classList.add('copied');
+          setTimeout(()=>{ shareBtn.innerHTML = original; shareBtn.classList.remove('copied'); }, 1800);
+        }catch(e){
+          console.error('Copy failed', e);
+        }
+      });
+    }
+  }
 
-function showError(){
-    document.getElementById("content").innerHTML = `
-        <div class="card">
-            <h2 style="color:${"var(--primary)"}">Stream Not Found</h2>
-            <p>The requested stream does not exist.</p>
-        </div>`;
-}
+  function renderErrorUI(){
+    document.title = 'Error - Stream Not Found';
+    streamContent.innerHTML = `
+      <div class="error-message">
+        <h2><i class="fa-solid fa-triangle-exclamation"></i> Stream Not Found</h2>
+        <p>The requested stream ID is invalid or offline.</p>
+        <a href="#" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to All Streams</a>
+      </div>
+    `;
+  }
 
-function showPopup(){
-    const p = document.getElementById("popupBox");
-    p.style.display = "block";
-    p.style.opacity = 1;
-}
-function closePopup(){
-    const p = document.getElementById("popupBox");
-    p.style.display = "none";
-}
+  // Popup logic
+  function showPopup(delay = 1200){
+    setTimeout(()=>{
+      telegramPopup.classList.add('show');
+      telegramPopup.setAttribute('aria-hidden','false');
+    }, delay);
+  }
+  function closePopup(){
+    telegramPopup.classList.remove('show');
+    telegramPopup.setAttribute('aria-hidden','true');
+  }
 
-document.addEventListener("DOMContentLoaded", start);
+  // visitor dot toggle
+  visitorDot.addEventListener('click', ()=>{
+    if(visitorPopup.style.display === 'block'){
+      visitorPopup.style.display = 'none';
+      visitorPopup.setAttribute('aria-hidden','true');
+    } else {
+      visitorPopup.style.display = 'block';
+      visitorPopup.setAttribute('aria-hidden','false');
+    }
+  });
+
+  // already joined closes popup
+  alreadyJoinedBtn.addEventListener('click', closePopup);
+
+  // Main init
+  async function initializeApp(){
+    try{
+      const resp = await fetch(FETCH_URL, {cache:'no-store'});
+      if(!resp.ok) throw new Error('Fetch failed: ' + resp.status);
+      const data = await resp.json();
+
+      // find by id param
+      const urlParams = new URLSearchParams(window.location.search);
+      const streamId = urlParams.get('id') || urlParams.get('channel') || null;
+
+      if(!streamId){
+        // fallback — if only one entry or first entry desired, you can adjust here.
+        // We'll try to render first iframe if exists
+        if(Array.isArray(data.iframes) && data.iframes.length){
+          renderIframeUI(data.iframes[0]);
+          showPopup(1200);
+        } else {
+          renderErrorUI();
+        }
+        return;
+      }
+
+      const streamData = Array.isArray(data.iframes) ? data.iframes.find(item => String(item.id) === String(streamId)) : null;
+      if(streamData){
+        renderIframeUI(streamData);
+        showPopup(1200);
+      } else {
+        renderErrorUI();
+      }
+    }catch(err){
+      console.error('initializeApp error:', err);
+      renderErrorUI();
+    }
+  }
+
+  // Kick off on DOM ready
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', initializeApp);
+  } else {
+    initializeApp();
+  }
+
+  // Accessibility: close popup on Escape
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape') {
+      if(telegramPopup.classList.contains('show')) closePopup();
+      if(visitorPopup.style.display === 'block') { visitorPopup.style.display = 'none'; visitorPopup.setAttribute('aria-hidden','true'); }
+    }
+  });
+
+})();
 </script>
-
 </body>
 </html>
