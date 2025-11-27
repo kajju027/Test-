@@ -15,7 +15,7 @@
 <style>
 :root{
   --bg-color: #121212;
-  --primary-main: #c70c0c; /* **রং পরিবর্তনের জন্য এই লাইনটি পরিবর্তন করতে হবে** */
+  --primary-main: #c70c0c; 
   --primary-alt: #db1f1f;
   --primary-alt-dark: #a60000;
   --card-bg: #1e1e1e;
@@ -160,14 +160,14 @@ body{
   transform:translate(-50%,-50%) scale(.96);
   background:#131313;
   color:var(--text-light);
-  /* **পপআপের আকার বাড়াতে প্যাডিং পরিবর্তন করা হয়েছে** */
-  padding:40px 22px; 
+  /* পপআপের আকার আরও একটু বাড়ানো হলো */
+  padding:45px 25px; 
   border-radius:16px;
   border:1px solid rgba(199,12,12,0.14);
   box-shadow:0 30px 90px rgba(0,0,0,0.7);
   z-index:12000;
   width:92%;
-  max-width:380px; /* **আকার উল্লম্ব রাখতে সামান্য কমানো হয়েছে** */
+  max-width:400px; /* আকার সামঞ্জস্য করা হলো */
   display:none;
   opacity:0;
   transition:all .28s cubic-bezier(.2,.9,.2,1);
@@ -175,55 +175,30 @@ body{
 }
 .telegram-popup.show{ display:block; opacity:1; transform:translate(-50%,-50%) scale(1); }
 .telegram-popup h2{ color:var(--primary-main); font-size:1.6rem; margin-bottom:.55rem; text-shadow:0 0 12px rgba(199,12,12,0.06); }
-.telegram-popup p{ color:var(--text-muted); line-height:1.5; margin-bottom:1rem; }
+.telegram-popup p{ color:var(--text-muted); line-height:1.5; margin-bottom:1.2rem; }
 
-/* join/ok buttons inside popup */
+/* join/ok buttons inside popup (পরিবর্তিত - আকার বাড়ানো হলো) */
 .telegram-popup button{
   width:100%;
-  padding:12px;
-  border-radius:10px;
+  /* বাটনের প্যাডিং ও ফন্ট সাইজ বাড়ানো হলো */
+  padding:14px; 
+  border-radius:12px;
   border:0;
   font-weight:800;
   cursor:pointer;
+  font-size:1.1rem; 
 }
 .telegram-popup .join-btn{
   background:linear-gradient(90deg,var(--primary-main),var(--primary-alt));
   color:#fff;
   box-shadow:0 10px 30px rgba(199,12,12,0.14);
-  margin-bottom:.6rem;
+  margin-bottom:.8rem; /* দুটি বাটনের মধ্যে দূরত্ব বাড়ানো হলো */
 }
 .telegram-popup .joined-btn{
   background:#222;
   color:var(--text-light);
   border:1px solid rgba(255,255,255,0.02);
 }
-
-/* visitor dot & popup */
-.visitor-dot{
-  position:fixed;
-  right:24px;
-  bottom:22px;
-  width:22px;
-  height:22px;
-  border-radius:50%;
-  background:var(--primary-main);
-  box-shadow:0 8px 28px rgba(199,12,12,0.25);
-  z-index:11000;
-  cursor:pointer;
-}
-.visitor-popup{
-  display:none;
-  position:fixed;
-  right:24px;
-  bottom:64px;
-  background:#0f0f0f;
-  border-radius:10px;
-  padding:10px;
-  border:1px solid rgba(255,255,255,0.03);
-  box-shadow:0 12px 40px rgba(0,0,0,0.6);
-  z-index:11000;
-}
-.visitor-popup img{ width:150px; height:auto; display:block; }
 
 /* error */
 .error-message{ text-align:center; padding:3.2rem 1rem; background:var(--card-bg); border-radius:12px; border:1px solid var(--border-color); }
@@ -233,8 +208,9 @@ body{
 @media (max-width:600px){
   #player-container{ height:48vh; }
   .stream-header h1{ font-size:1.05rem; }
-  /* **মোবাইল স্ক্রিনেও পপআপের প্যাডিং বাড়ানো হলো** */
-  .telegram-popup{ padding:30px 20px; width:94%; max-width:360px; }
+  /* মোবাইল স্ক্রিনে পপআপের প্যাডিং বাড়ানো হলো */
+  .telegram-popup{ padding:35px 20px; width:94%; max-width:360px; }
+  .telegram-popup button{ padding:12px; font-size:1rem; }
 }
 </style>
 </head>
@@ -245,36 +221,43 @@ body{
 
 <div class="telegram-popup" id="telegramPopup" role="dialog" aria-modal="true" aria-hidden="true">
   <h2><i class="fa-brands fa-telegram"></i> Support Us!</h2>
-  <p>Join our WhatsApp Channel <strong>𝗖𝗥𝗜𝗖𝗞𝗘𝗧 𝗡𝗘𝗪𝗦 𝗣𝗢𝗜𝗡𝗧</strong></p>
+  <p>Join our WhatsApp Channel <strong>𝗖𝗥𝗜𝗖𝗞𝗘𝗧 𝗡𝗘𝗪 এস 𝗣𝗢𝗜𝗡𝗧</strong></p>
   <a id="joinLink" href="https://whatsapp.com/channel/0029VaeylYYBPzjVNomWuZ0T" target="_blank" rel="noopener">
     <button class="join-btn">Join Now</button>
   </a>
   <button class="joined-btn" id="alreadyJoinedBtn">Already Joined</button>
 </div>
 
-<div class="visitor-dot" id="visitorDot" title="Visitors"></div>
-<div class="visitor-popup" id="visitorPopup" aria-hidden="true">
-  <img src="https://www.counter12.com/img-9205Yd3W54Z3y43Z-5.gif" alt="Visitor Counter">
-</div>
-
 <script>
 /*
-  Full page JS: fetch JSON, render UI, share-copy, popup logic, visitor dot toggle.
-  NOTE: If you want different JSON source change the FETCH_URL variable.
+  Full page JS: fetch JSON, render UI, share-copy, popup logic.
+  Visitor Counter is now loaded silently in the background.
 */
 (function(){
   const FETCH_URL = 'https://raw.githubusercontent.com/Cricketstan/Allrounder-/refs/heads/main/id.json';
+  const VISITOR_IMG_URL = 'https://www.counter12.com/img-9205Yd3W54Z3y43Z-5.gif'; // লুকানো কাউন্টার
 
   // DOM refs
   const streamContent = document.getElementById('stream-content');
   const telegramPopup = document.getElementById('telegramPopup');
   const joinLink = document.getElementById('joinLink');
   const alreadyJoinedBtn = document.getElementById('alreadyJoinedBtn');
-  const visitorDot = document.getElementById('visitorDot');
-  const visitorPopup = document.getElementById('visitorPopup');
 
   // helpers
   function safeHTML(str){ const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+
+  // 1. ভিজিটর কাউন্টারকে ব্যাকগ্রাউন্ডে লোড করার ফাংশন
+  function loadVisitorCounter(){
+    const img = document.createElement('img');
+    img.src = VISITOR_IMG_URL;
+    // কাউন্টার লুকানোর জন্য স্টাইল
+    img.style.position = 'absolute';
+    img.style.left = '-9999px';
+    img.style.width = '1px';
+    img.style.height = '1px';
+    img.setAttribute('alt', 'Visitor Counter');
+    document.body.appendChild(img);
+  }
 
   // Render functions
   function renderIframeUI(data){
@@ -355,22 +338,14 @@ body{
     telegramPopup.setAttribute('aria-hidden','true');
   }
 
-  // visitor dot toggle
-  visitorDot.addEventListener('click', ()=>{
-    if(visitorPopup.style.display === 'block'){
-      visitorPopup.style.display = 'none';
-      visitorPopup.setAttribute('aria-hidden','true');
-    } else {
-      visitorPopup.style.display = 'block';
-      visitorPopup.setAttribute('aria-hidden','false');
-    }
-  });
-
   // already joined closes popup
   alreadyJoinedBtn.addEventListener('click', closePopup);
 
   // Main init
   async function initializeApp(){
+    // ভিজিটর কাউন্টার ব্যাকগ্রাউন্ডে লোড করুন
+    loadVisitorCounter(); 
+
     try{
       const resp = await fetch(FETCH_URL, {cache:'no-store'});
       if(!resp.ok) throw new Error('Fetch failed: ' + resp.status);
@@ -381,8 +356,7 @@ body{
       const streamId = urlParams.get('id') || urlParams.get('channel') || null;
 
       if(!streamId){
-        // fallback — if only one entry or first entry desired, you can adjust here.
-        // We'll try to render first iframe if exists
+        // fallback
         if(Array.isArray(data.iframes) && data.iframes.length){
           renderIframeUI(data.iframes[0]);
           showPopup(1200);
@@ -416,7 +390,6 @@ body{
   document.addEventListener('keydown', (e)=>{
     if(e.key === 'Escape') {
       if(telegramPopup.classList.contains('show')) closePopup();
-      if(visitorPopup.style.display === 'block') { visitorPopup.style.display = 'none'; visitorPopup.setAttribute('aria-hidden','true'); }
     }
   });
 
