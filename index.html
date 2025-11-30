@@ -90,6 +90,26 @@ body{
   border:1px solid rgba(255,255,255,0.02);
 }
 
+/* 💡 নতুন CSS: ফুলস্ক্রিন ফিক্সের জন্য */
+iframe:fullscreen {
+    width: 100vw !important;
+    height: 100vh !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 2147483647 !important; 
+}
+/* ব্রাউজার কম্প্যাটিবিলিটির জন্য প্রিফিক্স */
+:-webkit-full-screen iframe {
+    width: 100% !important;
+    height: 100% !important;
+}
+:-moz-full-screen iframe {
+    width: 100% !important;
+    height: 100% !important;
+}
+/* 💡 নতুন CSS শেষ */
+
 .info-card{
   background:var(--card-bg);
   border:1px solid var(--border-color);
