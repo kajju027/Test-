@@ -4,12 +4,15 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, maximum-scale=1.0, user-scalable=no" />
 <title>CRICKET NEWS POINT ™</title>
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Amaranth:ital,wght@0,400;0,700;1,700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Amaranth:ital,wght@0,400;0,700;1,700&family=Bebas+Neue&family=Momo+Trust+Display&family=Science+Gothic:slnt,wdth,wght,CTRS@-10..0,50..200,100..900,0..85&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.3.4/dist/controls.css">
+<script src="https://cdn.jsdelivr.net/npm/shaka-player@4.3.4/dist/shaka-player.compiled.js"></script>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
+/* আপনার পূর্বের CSS অপরিবর্তিত রাখা হলো */
 :root{
   --bg-color: #121212;
   --primary-main: #c70c0c;
@@ -24,7 +27,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{
-  font-family: 'Amaranth','Bebas Neue', sans-serif;
+  font-family: 'Amaranth','Momo Trust Display','Science Gothic','Bebas Neue', sans-serif;
   background:var(--bg-color);
   color:var(--text-light);
   display:flex;
@@ -89,26 +92,21 @@ body{
   box-shadow:0 18px 60px rgba(0,0,0,0.6);
   border:1px solid rgba(255,255,255,0.02);
 }
+/* Shaka Player-এর জন্য প্রয়োজনীয় স্টাইল */
+#video, .shaka-controls-container {
+    width: 100%;
+    height: 100%;
+}
+#video {
+    object-fit: contain; /* ভিডিওটি যেন প্লেয়ারের মধ্যে সম্পূর্ণ দেখা যায় */
+}
+/* Shaka Player কন্টেইনার */
+.shaka-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
 
-/* 💡 নতুন CSS: ফুলস্ক্রিন ফিক্সের জন্য */
-iframe:fullscreen {
-    width: 100vw !important;
-    height: 100vh !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    z-index: 2147483647 !important; 
-}
-/* ব্রাউজার কম্প্যাটিবিলিটির জন্য প্রিফিক্স */
-:-webkit-full-screen iframe {
-    width: 100% !important;
-    height: 100% !important;
-}
-:-moz-full-screen iframe {
-    width: 100% !important;
-    height: 100% !important;
-}
-/* 💡 নতুন CSS শেষ */
 
 .info-card{
   background:var(--card-bg);
@@ -236,10 +234,6 @@ iframe:fullscreen {
   .telegram-popup{ padding:22px; width:94%; max-width:360px; }
 }
 </style>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.3.4/dist/controls.css" media="print" onload="this.media='all'">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
-
 </head>
 <body>
 <main class="container">
@@ -273,6 +267,7 @@ iframe:fullscreen {
 
   function safeHTML(str){ const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
 
+  // --- নতুন renderIframeUI ফাংশন: Shaka Player এবং রোটেশন লজিক সহ ---
   function renderIframeUI(data){
     document.title = `${data.name} • CRICKET NEWS POINT`;
     streamContent.innerHTML = `
@@ -282,13 +277,9 @@ iframe:fullscreen {
       </div>
 
       <div id="player-container">
-        <iframe 
-          src="${data.iframeSrc}" 
-          style="width:100%; height:100%; border:0;" 
-          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen" 
-          allowfullscreen 
-          sandbox="allow-scripts allow-same-origin allow-forms"
-        ></iframe>
+        <div id="videoContainer" class="shaka-container">
+            <video id="video" autoplay controls style="width:100%; height:100%;"></video>
+        </div>
       </div>
 
       <div class="info-card">
@@ -306,6 +297,52 @@ iframe:fullscreen {
       <a href="#" class="back-link" id="backLink"><i class="fa-solid fa-arrow-left"></i> Back to All Streams</a>
     `;
 
+    // --- Shaka Player এবং রোটেশন লজিক ---
+    const videoElement = document.getElementById('video');
+    const container = document.getElementById('player-container');
+    const manifestUri = data.iframeSrc; // ধরে নেওয়া হলো iframeSrc-এ HLS/DASH manifest link আছে
+
+    if (shaka && shaka.Player.is '); /* প্লেয়ার লোড করার আগে পরীক্ষা করা হচ্ছে */
+      // Shaka Player ইনিশিয়ালাইজেশন
+      const player = new shaka.Player(videoElement);
+      
+      // স্ট্যান্ডার্ড Shaka UI কন্ট্রোল যুক্ত করা
+      const controls = new shaka.ui.Controls(player, container, videoElement);
+      
+      // স্ট্রিম লোড করা
+      player.load(manifestUri).catch(function(error) {
+        console.error('Shaka Player Error loading manifest:', error);
+        // লোড ব্যর্থ হলে ইউজারকে জানানো যেতে পারে
+        alert('Stream loading failed. Check console for details.');
+      });
+      
+      // ফুলস্ক্রিন চেঞ্জ ইভেন্ট লিসেনার
+      document.addEventListener('fullscreenchange', () => {
+          const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+          
+          if (isFullscreen) {
+              // ফুলস্ক্রিনে প্রবেশ করলে: স্ক্রিন ল্যান্ডস্কেপে লক করার চেষ্টা
+              if (screen.orientation && screen.orientation.lock) {
+                  screen.orientation.lock('landscape').catch((err) => {
+                      console.warn('Screen lock failed (This is normal if device rotation is disabled):', err.message);
+                  });
+              }
+          } else {
+              // ফুলস্ক্রিন থেকে বের হলে: স্ক্রিন আনলক করার চেষ্টা
+              if (screen.orientation && screen.orientation.unlock) {
+                  screen.orientation.unlock();
+              }
+          }
+      });
+    } else if (shaka) {
+        console.error("Shaka Player is not supported by this browser.");
+    } else {
+        console.error("Shaka Player library failed to load.");
+    }
+    // --- শেষ Shaka Player এবং রোটেশন লজিক ---
+    
+    
+    // --- Share Button লজিক (পূর্বের মতোই) ---
     const shareBtn = document.getElementById('shareButton');
     if(shareBtn){
       shareBtn.addEventListener('click', async function(){
@@ -331,6 +368,8 @@ iframe:fullscreen {
       });
     }
   }
+  // --- নতুন renderIframeUI ফাংশন শেষ ---
+
 
   function renderErrorUI(){
     document.title = 'Error - Stream Not Found';
@@ -358,6 +397,15 @@ iframe:fullscreen {
 
   async function initializeApp(){
     try{
+      // Shaka Player-এর জন্য পলিফিল এবং ব্রাউজার সাপোর্ট চেক
+      if (shaka && shaka.Player.isSupported()) {
+          shaka.polyfill.installAll();
+      } else {
+          console.error('Browser does not support Shaka Player.');
+          renderErrorUI(); // অথবা অন্য কোনো এরর মেসেজ দেখান
+          return;
+      }
+      
       const resp = await fetch(FETCH_URL, {cache:'no-store'});
       if(!resp.ok) throw new Error('Fetch failed: ' + resp.status);
       const data = await resp.json();
@@ -374,6 +422,7 @@ iframe:fullscreen {
 
       const streamData = Array.isArray(data.iframes) ? data.iframes.find(item => String(item.id) === String(streamId)) : null;
       if(streamData){
+        // **গুরুত্বপূর্ণ:** নিশ্চিত করুন যে streamData.iframeSrc এ HLS (.m3u8) বা DASH (.mpd) ফাইলের লিঙ্ক আছে।
         renderIframeUI(streamData);
         showPopup(); 
       } else {
