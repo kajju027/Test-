@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-/* আপনার পূর্বের CSS অপরিবর্তিত রাখা হলো */
+/* আপনার CSS অপরিবর্তিত রাখা হলো */
 :root{
   --bg-color: #121212;
   --primary-main: #c70c0c;
@@ -92,15 +92,14 @@ body{
   box-shadow:0 18px 60px rgba(0,0,0,0.6);
   border:1px solid rgba(255,255,255,0.02);
 }
-/* Shaka Player-এর জন্য প্রয়োজনীয় স্টাইল */
+/* Shaka Player কন্টেইনার স্টাইল */
 #video, .shaka-controls-container {
     width: 100%;
     height: 100%;
 }
 #video {
-    object-fit: contain; /* ভিডিওটি যেন প্লেয়ারের মধ্যে সম্পূর্ণ দেখা যায় */
+    object-fit: contain;
 }
-/* Shaka Player কন্টেইনার */
 .shaka-container {
     position: relative;
     width: 100%;
@@ -267,7 +266,7 @@ body{
 
   function safeHTML(str){ const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
 
-  // --- নতুন renderIframeUI ফাংশন: Shaka Player এবং রোটেশন লজিক সহ ---
+  // --- renderIframeUI ফাংশন: Shaka Player এবং রোটেশন লজিক সহ ---
   function renderIframeUI(data){
     document.title = `${data.name} • CRICKET NEWS POINT`;
     streamContent.innerHTML = `
@@ -300,9 +299,11 @@ body{
     // --- Shaka Player এবং রোটেশন লজিক ---
     const videoElement = document.getElementById('video');
     const container = document.getElementById('player-container');
-    const manifestUri = data.iframeSrc; // ধরে নেওয়া হলো iframeSrc-এ HLS/DASH manifest link আছে
+    
+    // **গুরুত্বপূর্ণ:** manifestUri-কে আপনার HLS/DASH স্ট্রিম লিঙ্ক হতে হবে।
+    const manifestUri = data.iframeSrc; 
 
-    if (shaka && shaka.Player.is '); /* প্লেয়ার লোড করার আগে পরীক্ষা করা হচ্ছে */
+    if (shaka && shaka.Player.isSupported()) {
       // Shaka Player ইনিশিয়ালাইজেশন
       const player = new shaka.Player(videoElement);
       
@@ -313,10 +314,9 @@ body{
       player.load(manifestUri).catch(function(error) {
         console.error('Shaka Player Error loading manifest:', error);
         // লোড ব্যর্থ হলে ইউজারকে জানানো যেতে পারে
-        alert('Stream loading failed. Check console for details.');
       });
       
-      // ফুলস্ক্রিন চেঞ্জ ইভেন্ট লিসেনার
+      // *** এটিই আসল রোটেশন লজিক যা আপনি চাইছেন ***
       document.addEventListener('fullscreenchange', () => {
           const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
           
@@ -324,7 +324,8 @@ body{
               // ফুলস্ক্রিনে প্রবেশ করলে: স্ক্রিন ল্যান্ডস্কেপে লক করার চেষ্টা
               if (screen.orientation && screen.orientation.lock) {
                   screen.orientation.lock('landscape').catch((err) => {
-                      console.warn('Screen lock failed (This is normal if device rotation is disabled):', err.message);
+                      // যদি ব্রাউজার অনুমতি না দেয় (যেমন iOS), তাহলে এটি কাজ করবে না।
+                      console.warn('Screen lock failed. User needs auto-rotate enabled.', err.message);
                   });
               }
           } else {
@@ -334,10 +335,9 @@ body{
               }
           }
       });
-    } else if (shaka) {
-        console.error("Shaka Player is not supported by this browser.");
     } else {
-        console.error("Shaka Player library failed to load.");
+        console.error("Shaka Player is not supported or failed to initialize.");
+        // বিকল্প হিসাবে এখানে একটি সাধারণ <video> ট্যাগ ব্যবহার করা যেতে পারে
     }
     // --- শেষ Shaka Player এবং রোটেশন লজিক ---
     
@@ -368,7 +368,6 @@ body{
       });
     }
   }
-  // --- নতুন renderIframeUI ফাংশন শেষ ---
 
 
   function renderErrorUI(){
@@ -376,7 +375,7 @@ body{
     streamContent.innerHTML = `
       <div class="error-message">
         <h2><i class="fa-solid fa-triangle-exclamation"></i> Stream Not Found</h2>
-        <p>The Requested Stream ID Is Invalid Or Offline.</p>
+        <p>The Requested Stream ID Is Invalid Or Offline. (DASH/HLS stream link is required.)</p>
         <a href="#" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back To All Streams </a>
       </div>
     `;
@@ -402,7 +401,7 @@ body{
           shaka.polyfill.installAll();
       } else {
           console.error('Browser does not support Shaka Player.');
-          renderErrorUI(); // অথবা অন্য কোনো এরর মেসেজ দেখান
+          renderErrorUI();
           return;
       }
       
@@ -422,7 +421,7 @@ body{
 
       const streamData = Array.isArray(data.iframes) ? data.iframes.find(item => String(item.id) === String(streamId)) : null;
       if(streamData){
-        // **গুরুত্বপূর্ণ:** নিশ্চিত করুন যে streamData.iframeSrc এ HLS (.m3u8) বা DASH (.mpd) ফাইলের লিঙ্ক আছে।
+        // **পুনরায় নিশ্চিত করুন:** streamData.iframeSrc এ HLS (.m3u8) বা DASH (.mpd) ফাইলের লিঙ্ক আছে।
         renderIframeUI(streamData);
         showPopup(); 
       } else {
