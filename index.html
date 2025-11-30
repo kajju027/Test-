@@ -4,15 +4,13 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, maximum-scale=1.0, user-scalable=no" />
 <title>CRICKET NEWS POINT ™</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Amaranth:ital,wght@0,400;0,700;1,700&family=Bebas+Neue&family=Momo+Trust+Display&family=Science+Gothic:slnt,wdth,wght,CTRS@-10..0,50..200,100..900,0..85&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.3.4/dist/controls.css">
-<script src="https://cdn.jsdelivr.net/npm/shaka-player@4.3.4/dist/shaka-player.compiled.js"></script>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Amaranth:ital,wght@0,400;0,700;1,700&family=Bebas+Neue&display=swap" rel="stylesheet">
+
 <style>
-/* আপনার CSS অপরিবর্তিত রাখা হলো */
 :root{
   --bg-color: #121212;
   --primary-main: #c70c0c;
@@ -27,7 +25,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{
-  font-family: 'Amaranth','Momo Trust Display','Science Gothic','Bebas Neue', sans-serif;
+  font-family: 'Amaranth','Bebas Neue', sans-serif;
   background:var(--bg-color);
   color:var(--text-light);
   display:flex;
@@ -76,6 +74,7 @@ body{
   animation:badgePulse 1.6s infinite;
   box-shadow:0 6px 18px rgba(199,12,12,0.12);
 }
+
 @keyframes badgePulse{
   0%{ transform:scale(1); box-shadow:0 0 0 0 rgba(199,12,12,0.18); }
   70%{ box-shadow:0 0 0 10px rgba(199,12,12,0); }
@@ -92,20 +91,6 @@ body{
   box-shadow:0 18px 60px rgba(0,0,0,0.6);
   border:1px solid rgba(255,255,255,0.02);
 }
-/* Shaka Player কন্টেইনার স্টাইল */
-#video, .shaka-controls-container {
-    width: 100%;
-    height: 100%;
-}
-#video {
-    object-fit: contain;
-}
-.shaka-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-
 
 .info-card{
   background:var(--card-bg);
@@ -143,6 +128,7 @@ body{
   transition:transform .18s ease, box-shadow .18s ease;
   font-size:1rem;
 }
+
 .action-button:hover{ transform:translateY(-3px); box-shadow:0 12px 36px rgba(199,12,12,0.18); }
 .action-button.copied{ background:linear-gradient(90deg,#22c55e,#4ade80); }
 
@@ -195,9 +181,25 @@ body{
   transition:all .1s ease-in-out;
   text-align:center;
 }
-.telegram-popup.show{ display:block; opacity:1; transform:translate(-50%,-50%) scale(1); }
-.telegram-popup h2{ color:var(--primary-main); font-size:1.6rem; margin-bottom:.55rem; text-shadow:0 0 12px rgba(199,12,12,0.06); }
-.telegram-popup p{ color:var(--text-muted); line-height:1.5; margin-bottom:1rem; }
+
+.telegram-popup.show{
+  display:block;
+  opacity:1;
+  transform:translate(-50%,-50%) scale(1);
+}
+
+.telegram-popup h2{
+  color:var(--primary-main);
+  font-size:1.6rem;
+  margin-bottom:.55rem;
+  text-shadow:0 0 12px rgba(199,12,12,0.06);
+}
+
+.telegram-popup p{
+  color:var(--text-muted);
+  line-height:1.5;
+  margin-bottom:1rem;
+}
 
 .telegram-popup button{
   width:100%;
@@ -224,8 +226,18 @@ body{
   display: none !important;
 }
 
-.error-message{ text-align:center; padding:3.2rem 1rem; background:var(--card-bg); border-radius:12px; border:1px solid var(--border-color); }
-.error-message h2{ color:var(--primary-main); margin-bottom:.6rem; font-size:1.4rem; }
+.error-message{
+  text-align:center;
+  padding:3.2rem 1rem;
+  background:var(--card-bg);
+  border-radius:12px;
+  border:1px solid var(--border-color);
+}
+.error-message h2{
+  color:var(--primary-main);
+  margin-bottom:.6rem;
+  font-size:1.4rem;
+}
 
 @media (max-width:600px){
   #player-container{ height:48vh; }
@@ -233,6 +245,10 @@ body{
   .telegram-popup{ padding:22px; width:94%; max-width:360px; }
 }
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.3.4/dist/controls.css" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+
 </head>
 <body>
 <main class="container">
@@ -249,10 +265,6 @@ body{
   </a>
   <button class="joined-btn" id="alreadyJoinedBtn">Already Joined</button>
 </div>
-<div class="visitor-dot" id="visitorDot" title="Visitors"></div>
-<div class="visitor-popup" id="visitorPopup" aria-hidden="true">
-  <img src="        " alt="Visitor Counter">
-</div>
 
 <script>
 (function(){
@@ -266,7 +278,6 @@ body{
 
   function safeHTML(str){ const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
 
-  // --- renderIframeUI ফাংশন: Shaka Player এবং রোটেশন লজিক সহ ---
   function renderIframeUI(data){
     document.title = `${data.name} • CRICKET NEWS POINT`;
     streamContent.innerHTML = `
@@ -276,9 +287,7 @@ body{
       </div>
 
       <div id="player-container">
-        <div id="videoContainer" class="shaka-container">
-            <video id="video" autoplay controls style="width:100%; height:100%;"></video>
-        </div>
+        <iframe src="${data.iframeSrc}" style="width:100%; height:100%; border:0;" allow="encrypted-media; autoplay; fullscreen" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
       </div>
 
       <div class="info-card">
@@ -296,53 +305,6 @@ body{
       <a href="#" class="back-link" id="backLink"><i class="fa-solid fa-arrow-left"></i> Back to All Streams</a>
     `;
 
-    // --- Shaka Player এবং রোটেশন লজিক ---
-    const videoElement = document.getElementById('video');
-    const container = document.getElementById('player-container');
-    
-    // **গুরুত্বপূর্ণ:** manifestUri-কে আপনার HLS/DASH স্ট্রিম লিঙ্ক হতে হবে।
-    const manifestUri = data.iframeSrc; 
-
-    if (shaka && shaka.Player.isSupported()) {
-      // Shaka Player ইনিশিয়ালাইজেশন
-      const player = new shaka.Player(videoElement);
-      
-      // স্ট্যান্ডার্ড Shaka UI কন্ট্রোল যুক্ত করা
-      const controls = new shaka.ui.Controls(player, container, videoElement);
-      
-      // স্ট্রিম লোড করা
-      player.load(manifestUri).catch(function(error) {
-        console.error('Shaka Player Error loading manifest:', error);
-        // লোড ব্যর্থ হলে ইউজারকে জানানো যেতে পারে
-      });
-      
-      // *** এটিই আসল রোটেশন লজিক যা আপনি চাইছেন ***
-      document.addEventListener('fullscreenchange', () => {
-          const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
-          
-          if (isFullscreen) {
-              // ফুলস্ক্রিনে প্রবেশ করলে: স্ক্রিন ল্যান্ডস্কেপে লক করার চেষ্টা
-              if (screen.orientation && screen.orientation.lock) {
-                  screen.orientation.lock('landscape').catch((err) => {
-                      // যদি ব্রাউজার অনুমতি না দেয় (যেমন iOS), তাহলে এটি কাজ করবে না।
-                      console.warn('Screen lock failed. User needs auto-rotate enabled.', err.message);
-                  });
-              }
-          } else {
-              // ফুলস্ক্রিন থেকে বের হলে: স্ক্রিন আনলক করার চেষ্টা
-              if (screen.orientation && screen.orientation.unlock) {
-                  screen.orientation.unlock();
-              }
-          }
-      });
-    } else {
-        console.error("Shaka Player is not supported or failed to initialize.");
-        // বিকল্প হিসাবে এখানে একটি সাধারণ <video> ট্যাগ ব্যবহার করা যেতে পারে
-    }
-    // --- শেষ Shaka Player এবং রোটেশন লজিক ---
-    
-    
-    // --- Share Button লজিক (পূর্বের মতোই) ---
     const shareBtn = document.getElementById('shareButton');
     if(shareBtn){
       shareBtn.addEventListener('click', async function(){
@@ -369,22 +331,23 @@ body{
     }
   }
 
-
   function renderErrorUI(){
     document.title = 'Error - Stream Not Found';
     streamContent.innerHTML = `
       <div class="error-message">
         <h2><i class="fa-solid fa-triangle-exclamation"></i> Stream Not Found</h2>
-        <p>The Requested Stream ID Is Invalid Or Offline. (DASH/HLS stream link is required.)</p>
+        <p>The Requested Stream ID Is Invalid Or Offline.</p>
         <a href="#" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back To All Streams </a>
       </div>
     `;
   }
+
   function showPopup(){
     telegramPopup.classList.add('show');
     telegramPopup.setAttribute('aria-hidden','false');
     popupOverlay.classList.add('show');
   }
+
   function closePopup(){
     telegramPopup.classList.remove('show');
     telegramPopup.setAttribute('aria-hidden','true');
@@ -396,15 +359,6 @@ body{
 
   async function initializeApp(){
     try{
-      // Shaka Player-এর জন্য পলিফিল এবং ব্রাউজার সাপোর্ট চেক
-      if (shaka && shaka.Player.isSupported()) {
-          shaka.polyfill.installAll();
-      } else {
-          console.error('Browser does not support Shaka Player.');
-          renderErrorUI();
-          return;
-      }
-      
       const resp = await fetch(FETCH_URL, {cache:'no-store'});
       if(!resp.ok) throw new Error('Fetch failed: ' + resp.status);
       const data = await resp.json();
@@ -412,7 +366,6 @@ body{
       const urlParams = new URLSearchParams(window.location.search);
       const streamId = urlParams.get('id') || urlParams.get('channel') || null;
 
-      
       if(!streamId){
         renderErrorUI();
         showPopup(); 
@@ -421,7 +374,6 @@ body{
 
       const streamData = Array.isArray(data.iframes) ? data.iframes.find(item => String(item.id) === String(streamId)) : null;
       if(streamData){
-        // **পুনরায় নিশ্চিত করুন:** streamData.iframeSrc এ HLS (.m3u8) বা DASH (.mpd) ফাইলের লিঙ্ক আছে।
         renderIframeUI(streamData);
         showPopup(); 
       } else {
@@ -449,5 +401,43 @@ body{
 
 })();
 </script>
+
+<!-- 🔥 AUTO LANDSCAPE FULLSCREEN SCRIPT -->
+<script>
+(function(){
+  async function lockLandscape() {
+    try {
+      if (screen.orientation && screen.orientation.lock) {
+        await screen.orientation.lock("landscape");
+      }
+    } catch (e) {
+      console.warn("Orientation lock failed:", e);
+    }
+  }
+
+  async function unlockOrientation() {
+    try {
+      if (screen.orientation && screen.orientation.unlock) {
+        await screen.orientation.unlock();
+      }
+    } catch (e) {}
+  }
+
+  document.addEventListener("fullscreenchange", () => {
+    if (document.fullscreenElement) {
+      lockLandscape();  
+    } else {
+      unlockOrientation();
+    }
+  });
+
+  window.addEventListener("orientationchange", () => {
+    if (!document.fullscreenElement) {
+      unlockOrientation();
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
