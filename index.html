@@ -101,9 +101,6 @@ body{
   position:relative;
 }
 
-/* Fullscreen overlay button (page-level) */
-/* REMOVED: .fs-overlay-btn */
-
 /* small notice when using rotated-fallback */
 .rotate-fallback-notice{
   position:absolute;
@@ -118,7 +115,7 @@ body{
   display:none;
 }
 
-/* When we apply CSS-rotation fallback, apply styles */
+/* When we apply CSS-rotation fallback, apply styles (kept for iframe internal FS fallback) */
 .player-rotated{
   transform-origin: center center;
   width:100vh; /* swapped dims when rotated */
@@ -317,11 +314,37 @@ body{
 
   function safeHTML(str){ const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
 
-  /* Removed: Helper: request page-level fullscreen on an element */
-  /* Removed: Helper: exit fullscreen */
-  /* Removed: Try to lock orientation to landscape */
-  /* Removed: Try to unlock orientation */
+  /* Helper: Try to lock orientation to landscape */
+  async function lockLandscape() {
+    try {
+      if ('orientation' in screen && screen.orientation && screen.orientation.lock) {
+        await screen.orientation.lock("landscape");
+        return { locked: true, method: 'screen.orientation.lock' };
+      } else if (window.screen && window.screen.lockOrientation) {
+        let ok = window.screen.lockOrientation('landscape');
+        return { locked: !!ok, method: 'screen.lockOrientation' };
+      } else {
+        return { locked: false, reason: 'no-api' };
+      }
+    } catch (e) {
+      console.warn("Orientation lock failed:", e);
+      return { locked: false, error: e };
+    }
+  }
 
+  /* Helper: Try to unlock orientation */
+  async function unlockOrientation() {
+    try {
+      if ('orientation' in screen && screen.orientation && screen.orientation.unlock) {
+        screen.orientation.unlock();
+      } else if (window.screen && window.screen.unlockOrientation) {
+        window.screen.unlockOrientation();
+      }
+    } catch (e) {
+      console.warn('unlock orientation failed', e);
+    }
+  }
+  
   /* CSS fallback rotate: apply .player-rotated to #player-container */
   function applyRotateCssFallback(){
     const pc = document.getElementById('player-container');
@@ -338,6 +361,46 @@ body{
     const notice = document.querySelector('.rotate-fallback-notice');
     if(notice) notice.style.display = 'none';
   }
+
+  /* * CORE LOGIC: Handle fullscreen events for orientation locking
+   * This is triggered when the iframe *or* another element enters/exits fullscreen.
+   */
+  async function onFullScreenChange() {
+    const fsElement = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+    
+    if (fsElement) {
+      // Entered Fullscreen
+      const lockRes = await lockLandscape();
+      if (!lockRes.locked) {
+        // Fallback for devices like iOS/Safari where lock is restricted
+        applyRotateCssFallback();
+      }
+    } else {
+      // Exited Fullscreen
+      await unlockOrientation();
+      removeRotateCssFallback();
+    }
+  }
+
+  // Set up listeners for browser-level fullscreen changes
+  document.addEventListener('fullscreenchange', onFullScreenChange);
+  document.addEventListener('webkitfullscreenchange', onFullScreenChange);
+  document.addEventListener('msfullscreenchange', onFullScreenChange);
+  
+  // Clean up on orientation change if not in fullscreen (mostly for robustness)
+  window.addEventListener("orientationchange", () => {
+    if (!document.fullscreenElement) {
+      unlockOrientation();
+      removeRotateCssFallback();
+    }
+  });
+  
+  // Also detect Escape key to exit and clean up
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape'){
+        removeRotateCssFallback();
+      }
+    });
 
   function renderIframeUI(data){
     document.title = `${data.name} • CRICKET NEWS POINT`;
@@ -391,46 +454,7 @@ body{
         }
       });
     }
-
-    // Fullscreen button logic removed:
-    // const pageFsBtn = document.getElementById('pageFsBtn');
-    // const playerContainer = document.getElementById('player-container');
-    // pageFsBtn.addEventListener('click', async function(){...});
-
-    // Listen for fullscreenchange on document -> if user exits fullscreen, unlock & remove fallback
-    function onFullScreenChange(){
-      const fsElement = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
-      if(!fsElement){
-        // Fullscreen exited
-        // unlockOrientation(); // Removed
-        removeRotateCssFallback();
-      } else {
-        // Some element entered fullscreen; attempt lock
-        // lockLandscape().then(res=>{ // Removed
-          // if(!res.locked){
-            // if not locked, maybe show fallback notice (handled above)
-            // ensure rotate fallback visible if on iOS
-            applyRotateCssFallback();
-          // }
-        // }); // Removed
-      }
-    }
-    document.addEventListener('fullscreenchange', onFullScreenChange);
-    document.addEventListener('webkitfullscreenchange', onFullScreenChange);
-    document.addEventListener('msfullscreenchange', onFullScreenChange);
-
-    // Also detect Escape key to exit and clean up
-    document.addEventListener('keydown', (e)=>{
-      if(e.key === 'Escape'){
-        // exit fullscreen if needed
-        // if(document.fullscreenElement) exitFullscreen(); // Removed
-        removeRotateCssFallback();
-      }
-    });
-
-    // Additionally: if iframe-origin triggers fullscreen at top-level, fullscreenchange will catch it.
-    // But we CANNOT detect iframe internal fullscreen if it's cross-origin and it uses internal full-screening that doesn't affect top-level document.
-
+    // Fullscreen logic is now handled globally by onFullScreenChange
   }
 
   function renderErrorUI(){
@@ -504,11 +528,6 @@ body{
   } else {
     initializeApp();
   }
-
-  // Also if user rotates device physically, remove rotate-fallback (if any)
-  window.addEventListener('orientationchange', ()=>{
-    removeRotateCssFallback();
-  });
 
 })();
 </script>
